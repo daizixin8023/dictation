@@ -333,15 +333,15 @@
             <div class="setting-item">
                 <label>朗读速度：</label>
                 <div style="display: flex; align-items: center; gap: 10px;">
-                    <input type="range" id="speedSlider" min="0.5" max="1.2" step="0.1" value="0.7">
-                    <span class="speed-value" id="speedValue">0.7</span>
+                    <input type="range" id="speedSlider" min="0.5" max="1.2" step="0.1" value="1">
+                    <span class="speed-value" id="speedValue">1</span>
                 </div>
             </div>
             <div class="setting-item">
                 <label>默写间隔（秒）：</label>
                 <div style="display: flex; align-items: center; gap: 10px;">
-                    <input type="range" id="intervalSlider" min="5" max="60" step="5" value="15">
-                    <span class="speed-value" id="intervalValue">15</span>
+                    <input type="range" id="intervalSlider" min="5" max="60" step="5" value="10">
+                    <span class="speed-value" id="intervalValue">10</span>
                 </div>
             </div>
         </div>
@@ -440,60 +440,60 @@
         // 格式：{ keywords: ['二下语文第1课', ...], words: [...], phrases: {...}, isEnglish: false }
         const lessonDatabase = [
             // 二年级下 语文
-            { keywords: ['二下语文第1课', '二下语文第一课', '二年级下语文第1课', '二年级下期语文第1课'], 
+            { keywords: ['二下语文第1课', '二下语文第一课', '二年级下语文第1课', '二年级下期语文第1课', '语文第1课', '语文第一课'], 
               words: ['羞','遮','掩','躲','探','嫩','符','触','鹊'],
               phrases: { '羞':'害羞的羞','遮':'遮挡的遮','掩':'掩盖的掩','躲':'躲藏的躲','探':'探头的探','嫩':'嫩绿的嫩','符':'符号的符','触':'触摸的触','鹊':'喜鹊的鹊' },
               isEnglish: false },
-            { keywords: ['二下语文第2课', '二下语文第二课', '二年级下语文第2课'],
+            { keywords: ['二下语文第2课', '二下语文第二课', '二年级下语文第2课', '语文第2课', '语文第二课'],
               words: ['枯','荣','宿','徐','篱','疏','未'],
               phrases: { '枯':'枯萎的枯','荣':'光荣的荣','宿':'住宿的宿','徐':'徐徐的徐','篱':'篱笆的篱','疏':'疏远的疏','未':'未来的未' },
               isEnglish: false },
-            { keywords: ['二下语文第3课', '二下语文第三课', '二年级下语文第3课'],
+            { keywords: ['二下语文第3课', '二下语文第三课', '二年级下语文第3课', '语文第3课', '语文第三课'],
               words: ['笋','唤','揉','漆','轰','扭','钻','唠','辫','抚','滋','润','冈','豪'],
               phrases: { '笋':'竹笋的笋','唤':'呼唤的唤','揉':'揉眼的揉','漆':'漆黑的漆','轰':'轰隆的轰','扭':'扭动的扭','钻':'钻出的钻','唠':'唠叨的唠','辫':'辫子的辫','抚':'抚摸的抚','滋':'滋润的滋','润':'湿润的润','冈':'山冈的冈','豪':'自豪的豪' },
               isEnglish: false },
-            { keywords: ['二下语文第4课', '二下语文第四课', '二年级下语文第4课'],
+            { keywords: ['二下语文第4课', '二下语文第四课', '二年级下语文第4课', '语文第4课', '语文第四课'],
               words: ['玫','瑰','骨','终','瘸','拐','惋','莺'],
               phrases: { '玫':'玫瑰的玫','瑰':'玫瑰的瑰','骨':'骨头的骨','终':'终于的终','瘸':'瘸腿的瘸','拐':'拐杖的拐','惋':'惋惜的惋','莺':'黄莺的莺' },
               isEnglish: false },
-            { keywords: ['二下语文第5课', '二下语文第五课', '二年级下语文第5课'],
+            { keywords: ['二下语文第5课', '二下语文第五课', '二年级下语文第5课', '语文第5课', '语文第五课'],
               words: ['哦','股','缝','罐','塔','杜','鹃','脆'],
               phrases: { '哦':'哦的哦','股':'一股的股','缝':'石缝的缝','罐':'罐子的罐','塔':'宝塔的塔','杜':'杜鹃的杜','鹃':'杜鹃的鹃','脆':'清脆的脆' },
               isEnglish: false },
-            { keywords: ['二下语文第6课', '二下语文第六课', '二年级下语文第6课'],
+            { keywords: ['二下语文第6课', '二下语文第六课', '二年级下语文第6课', '语文第6课', '语文第六课'],
               words: ['锋','叔','曾','泞','窝','迈','荆','棘','瓣','莹','觅','需'],
               phrases: { '锋':'雷锋的锋','叔':'叔叔的叔','曾':'曾经的曾','泞':'泥泞的泞','窝':'鸟窝的窝','迈':'迈步的迈','荆':'荆棘的荆','棘':'荆棘的棘','瓣':'花瓣的瓣','莹':'晶莹的莹','觅':'寻觅的觅','需':'需要的需' },
               isEnglish: false },
-            { keywords: ['二下语文第7课', '二下语文第七课', '二年级下语文第7课'],
+            { keywords: ['二下语文第7课', '二下语文第七课', '二年级下语文第7课', '语文第7课', '语文第七课'],
               words: ['弱','末','萨','托','铃','簇','随','芬','芳','聊','倾','递','娇','掀'],
               phrases: { '弱':'弱小的弱','末':'末端的末','萨':'萨沙的萨','托':'托起的托','铃':'铃兰的铃','簇':'一簇的簇','随':'随风的随','芬':'芬芳的芬','芳':'芬芳的芳','聊':'聊天的聊','倾':'倾盆的倾','递':'传递的递','娇':'娇嫩的娇','掀':'掀起的掀' },
               isEnglish: false },
-            { keywords: ['二下语文第8课', '二下语文第八课', '二年级下语文第8课'],
+            { keywords: ['二下语文第8课', '二下语文第八课', '二年级下语文第8课', '语文第8课', '语文第八课'],
               words: ['卡','罗','尔','适','余','垫','洛','喵','绒','屉','免','糊','涂','厨','蹭'],
               phrases: { '卡':'卡片的卡','罗':'罗尔的罗','尔':'罗尔的尔','适':'舒适的适','余':'余下的余','垫':'垫子的垫','洛':'洛洛的洛','喵':'喵喵的喵','绒':'绒毛的绒','屉':'抽屉的屉','免':'免费的免','糊':'糊涂的糊','涂':'糊涂的涂','厨':'厨房的厨','蹭':'蹭饭的蹭' },
               isEnglish: false },
             // 二年级下 英语
-            { keywords: ['二下英语第1课', '二下英语第一课', '二年级下英语第1课', '二年级下期英语第1课', '二下英语Unit1'],
+            { keywords: ['二下英语第1课', '二下英语第一课', '二年级下英语第1课', '二年级下期英语第1课', '二下英语Unit1', '英语第1课', '英语第一课'],
               words: ['play','football','fly','kite','ride','bike','swim','snowman','can','look','make','model','plane'],
               phrases: { 'play':'play','football':'football','fly':'fly','kite':'kite','ride':'ride','bike':'bike','swim':'swim','snowman':'snowman','can':'can','look':'look','make':'make','model':'model','plane':'plane' },
               isEnglish: true },
-            { keywords: ['二下英语第2课', '二下英语第二课', '二年级下英语第2课', '二下英语Unit2'],
+            { keywords: ['二下英语第2课', '二下英语第二课', '二年级下英语第2课', '二下英语Unit2', '英语第2课', '英语第二课'],
               words: ['weather','sunny','cloudy','rainy','windy','snowy','cold','cool','warm','hot','umbrella','raincoat','scarf','sunglasses','coat'],
               phrases: {},
               isEnglish: true },
-            { keywords: ['二下英语第3课', '二下英语第三课', '二年级下英语第3课', '二下英语Unit3'],
+            { keywords: ['二下英语第3课', '二下英语第三课', '二年级下英语第3课', '二下英语Unit3', '英语第3课', '英语第三课'],
               words: ['spring','summer','autumn','winter','season','warm','hot','cool','cold'],
               phrases: {},
               isEnglish: true },
-            { keywords: ['二下英语第4课', '二下英语第四课', '二年级下英语第4课', '二下英语Unit4'],
+            { keywords: ['二下英语第4课', '二下英语第四课', '二年级下英语第4课', '二下英语Unit4', '英语第4课', '英语第四课'],
               words: ['time','clock','oclock','breakfast','lunch','dinner','bed'],
               phrases: {},
               isEnglish: true },
-            { keywords: ['二下英语第5课', '二下英语第五课', '二年级下英语第5课', '二下英语Unit5'],
+            { keywords: ['二下英语第5课', '二下英语第五课', '二年级下英语第5课', '二下英语Unit5', '英语第5课', '英语第五课'],
               words: ['get','up','go','school','home','bed','morning','afternoon','evening'],
               phrases: {},
               isEnglish: true },
-            { keywords: ['二下英语第6课', '二下英语第六课', '二年级下英语第6课', '二下英语Unit6'],
+            { keywords: ['二下英语第6课', '二下英语第六课', '二年级下英语第6课', '二下英语Unit6', '英语第6课', '英语第六课'],
               words: ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday','week'],
               phrases: {},
               isEnglish: true }
@@ -748,6 +748,10 @@
             currentRepeat++;
 
             if (currentRepeat < 3) {
+                // 每遍之间停留1.5秒（可被暂停中断）
+                for (let i = 0; i < 15 && isPlaying && !isPaused; i++) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                }
                 // 继续读同一词
                 await speakCurrentWord();
             } else {
