@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="小学生字默写工具，自动朗读生字，每个词读3遍，适合家长辅导孩子默写">
+    <title>小学生字默写工具 - 免费在线使用</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', 'PingFang SC', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+
+        .help-section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .help-section.collapsible {
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .help-section.collapsible:hover {
+            background: #f0f0f0;
+        }
+
+        .help-section h3 {
+            color: #667eea;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .help-section ul {
+            margin-left: 20px;
+            margin-top: 5px;
+        }
+
+        .help-section li {
+            margin-bottom: 5px;
+        }
+
+        .input-section {
+            margin-bottom: 30px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            font-family: inherit;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .hint {
+            margin-top: 8px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            font-size: 14px;
+            padding: 10px 20px;
+            margin-top: 10px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+            color: #999;
+            font-size: 12px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            flex: 1;
+            min-width: 120px;
+            padding: 15px 25px;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: white;
+        }
+
+        .btn-start {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .btn-start:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-pause {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .btn-pause:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(245, 87, 108, 0.4);
+        }
+
+        .btn-stop {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .btn-stop:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.4);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .display-section {
+            text-align: center;
+            padding: 30px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .current-word {
+            font-size: 72px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 15px;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .progress-info {
+            font-size: 18px;
+            color: #666;
+            margin-top: 15px;
+            white-space: pre-line;
+            line-height: 1.6;
+        }
+
+        .settings {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #e0e0e0;
+        }
+
+        .setting-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .setting-item label {
+            margin-bottom: 0;
+            font-weight: normal;
+        }
+
+        input[type="range"] {
+            width: 200px;
+        }
+
+        .speed-value {
+            font-weight: bold;
+            color: #667eea;
+            min-width: 50px;
+            text-align: right;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .subtitle {
+                font-size: 12px;
+            }
+
+            .current-word {
+                font-size: 48px;
+                min-height: 70px;
+            }
+
+            button {
+                min-width: 100%;
+            }
+
+            .help-section {
+                font-size: 12px;
+                padding: 12px;
+            }
+
+            .help-section h3 {
+                font-size: 13px;
+            }
+
+            .setting-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            input[type="range"] {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📚 小学生字默写工具</h1>
+        <div class="subtitle">免费在线使用 · 自动朗读 · 每个词读3遍</div>
+        
+        <div class="help-section">
+            <h3>📖 使用说明</h3>
+            <ul>
+                <li>在下方输入框中输入生字（每行一个，或用逗号/空格分隔）</li>
+                <li>点击"开始默写"按钮，工具会自动朗读每个生字</li>
+                <li>每个生字会以"XX的X"格式读3遍（如：害羞的羞）</li>
+                <li>可以随时暂停、继续或停止</li>
+                <li>支持自定义朗读速度和默写间隔时间</li>
+            </ul>
+        </div>
+
+        <div class="input-section">
+            <label for="wordList">请输入生字表：</label>
+            <textarea id="wordList" placeholder="例如：&#10;苹果&#10;香蕉&#10;橙子&#10;&#10;或者：苹果,香蕉,橙子"></textarea>
+            <div class="hint">💡 提示：可以每行一个词，也可以用逗号或空格分隔</div>
+            <div style="margin-top: 10px; display: flex; gap: 10px; flex-wrap: wrap;">
+                <button id="btnLoadDefault" class="btn-secondary">📖 加载示例</button>
+                <button id="btnClear" class="btn-secondary">🗑️ 清空</button>
+            </div>
+            <div class="hint" style="margin-top: 8px; font-size: 12px;">
+                ✨ 生字表会自动保存，下次打开时会自动加载
+            </div>
+        </div>
+
+        <div class="controls">
+            <button id="btnStart" class="btn-start">▶️ 开始默写</button>
+            <button id="btnPause" class="btn-pause" disabled>⏸️ 暂停</button>
+            <button id="btnStop" class="btn-stop" disabled>⏹️ 停止</button>
+        </div>
+
+        <div class="display-section">
+            <div class="current-word" id="currentWord">准备开始...</div>
+            <div class="progress-info" id="progressInfo">等待开始</div>
+        </div>
+
+        <div class="settings">
+            <div class="setting-item">
+                <label>朗读速度：</label>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <input type="range" id="speedSlider" min="0.5" max="1.2" step="0.1" value="0.7">
+                    <span class="speed-value" id="speedValue">0.7</span>
+                </div>
+            </div>
+            <div class="setting-item">
+                <label>默写间隔（秒）：</label>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <input type="range" id="intervalSlider" min="5" max="60" step="5" value="15">
+                    <span class="speed-value" id="intervalValue">15</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>💝 免费工具 · 适合1-6年级小学生使用</p>
+            <p style="margin-top: 5px; font-size: 11px;">建议使用 Chrome 或 Edge 浏览器以获得最佳体验</p>
+            <p style="margin-top: 5px; font-size: 11px;">生字表会自动保存，方便下次使用</p>
+        </div>
+    </div>
+
+    <script>
+        let words = [];
+        let currentIndex = 0;
+        let currentRepeat = 0;
+        let isPlaying = false;
+        let isPaused = false;
+        let speechSynthesis = window.speechSynthesis;
+        let currentUtterance = null;
+        let selectedVoice = null;
+
+        // 初始化语音选择（选择最佳的中文语音）
+        function initVoice() {
+            // 等待语音列表加载
+            const loadVoices = () => {
+                const voices = speechSynthesis.getVoices();
+                if (voices.length === 0) {
+                    // 如果列表还没加载，等待一下再试
+                    setTimeout(loadVoices, 100);
+                    return;
+                }
+
+                // 优先选择中文语音，按优先级排序
+                const chineseVoices = voices.filter(voice => 
+                    voice.lang.startsWith('zh') || 
+                    voice.lang.startsWith('cmn') ||
+                    voice.name.toLowerCase().includes('chinese') ||
+                    voice.name.toLowerCase().includes('中文')
+                );
+
+                if (chineseVoices.length > 0) {
+                    // 优先选择中国大陆的语音（zh-CN）
+                    let preferredVoice = chineseVoices.find(voice => 
+                        voice.lang === 'zh-CN' || 
+                        voice.lang === 'zh-CN-Standard-A' ||
+                        voice.lang === 'zh-CN-Standard-B' ||
+                        voice.lang === 'zh-CN-Standard-C' ||
+                        voice.lang === 'zh-CN-Standard-D'
+                    );
+                    
+                    if (!preferredVoice) {
+                        // 如果没有找到zh-CN，选择其他中文语音
+                        preferredVoice = chineseVoices.find(voice => 
+                            voice.lang.startsWith('zh-CN')
+                        );
+                    }
+                    
+                    if (!preferredVoice) {
+                        // 如果还没有，选择第一个中文语音
+                        preferredVoice = chineseVoices[0];
+                    }
+                    
+                    selectedVoice = preferredVoice;
+                } else {
+                    // 如果没有中文语音，使用默认语音
+                    selectedVoice = null;
+                }
+            };
+
+            loadVoices();
+        }
+
+        // 页面加载时初始化语音
+        if ('onvoiceschanged' in speechSynthesis) {
+            speechSynthesis.onvoiceschanged = initVoice;
+        }
+        initVoice();
+
+        const wordListInput = document.getElementById('wordList');
+        const btnStart = document.getElementById('btnStart');
+        const btnPause = document.getElementById('btnPause');
+        const btnStop = document.getElementById('btnStop');
+        const btnLoadDefault = document.getElementById('btnLoadDefault');
+        const btnClear = document.getElementById('btnClear');
+        const currentWordDisplay = document.getElementById('currentWord');
+        const progressInfo = document.getElementById('progressInfo');
+        const speedSlider = document.getElementById('speedSlider');
+        const speedValue = document.getElementById('speedValue');
+        const intervalSlider = document.getElementById('intervalSlider');
+        const intervalValue = document.getElementById('intervalValue');
+        let countdownTimer = null;
+
+        // 二年级下册第一、二课生字表及组词
+        const defaultWords = [
+            // 第一课
+            '羞', '遮', '掩', '躲', '探', '嫩', '符', '触', '鹊',
+            // 第二课
+            '枯', '荣', '宿', '徐', '篱', '疏', '未'
+        ];
+
+        // 生字组词映射（用于朗读时自动组词）
+        const wordPhrases = {
+            '羞': '害羞的羞',
+            '遮': '遮挡的遮',
+            '掩': '掩盖的掩',
+            '躲': '躲藏的躲',
+            '探': '探头的探',
+            '嫩': '嫩绿的嫩',
+            '符': '符号的符',
+            '触': '触摸的触',
+            '鹊': '喜鹊的鹊',
+            '枯': '枯萎的枯',
+            '荣': '光荣的荣',
+            '宿': '住宿的宿',
+            '徐': '徐徐的徐',
+            '篱': '篱笆的篱',
+            '疏': '疏远的疏',
+            '未': '未来的未'
+        };
+
+        // 获取生字的组词（如果没有预设，自动生成）
+        function getWordPhrase(word) {
+            if (wordPhrases[word]) {
+                return wordPhrases[word];
+            }
+            // 如果没有预设组词，尝试从输入中提取，或者使用默认格式
+            // 如果输入的是"XX的X"格式，直接使用
+            if (word.includes('的')) {
+                return word;
+            }
+            // 否则生成一个简单的组词
+            return `${word}字的${word}`;
+        }
+
+        // 保存生字表到本地存储
+        function saveWordList() {
+            const wordList = wordListInput.value.trim();
+            if (wordList) {
+                localStorage.setItem('savedWordList', wordList);
+            }
+        }
+
+        // 从本地存储加载生字表
+        function loadSavedWordList() {
+            const saved = localStorage.getItem('savedWordList');
+            if (saved) {
+                return saved;
+            }
+            return null;
+        }
+
+        // 页面加载时自动导入生字表
+        window.addEventListener('DOMContentLoaded', () => {
+            // 优先加载保存的生字表，如果没有则加载默认的
+            const saved = loadSavedWordList();
+            if (saved) {
+                wordListInput.value = saved;
+            } else {
+                wordListInput.value = defaultWords.join('\n');
+            }
+            
+            // 监听输入变化，自动保存
+            wordListInput.addEventListener('input', () => {
+                saveWordList();
+            });
+            
+            // 确保语音初始化完成
+            setTimeout(() => {
+                if (selectedVoice) {
+                    console.log('已选择语音:', selectedVoice.name, selectedVoice.lang);
+                } else {
+                    console.log('使用默认语音');
+                }
+            }, 500);
+        });
+
+        // 点击按钮加载默认生字表
+        btnLoadDefault.addEventListener('click', () => {
+            if (isPlaying) {
+                alert('请先停止当前默写！');
+                return;
+            }
+            wordListInput.value = defaultWords.join('\n');
+        });
+
+        // 清空输入框
+        btnClear.addEventListener('click', () => {
+            if (isPlaying) {
+                alert('请先停止当前默写！');
+                return;
+            }
+            if (confirm('确定要清空生字表吗？')) {
+                wordListInput.value = '';
+            }
+        });
+
+        // 更新速度显示
+        speedSlider.addEventListener('input', (e) => {
+            speedValue.textContent = e.target.value;
+        });
+
+        // 更新间隔时间显示
+        intervalSlider.addEventListener('input', (e) => {
+            intervalValue.textContent = e.target.value;
+        });
+
+        // 解析生字表
+        function parseWordList(text) {
+            if (!text.trim()) return [];
+            
+            // 先按换行分割
+            let wordArray = text.split('\n')
+                .map(line => line.trim())
+                .filter(line => line.length > 0);
+            
+            // 如果只有一行，尝试按逗号或空格分割
+            if (wordArray.length === 1) {
+                wordArray = wordArray[0].split(/[，,、\s]+/)
+                    .map(word => word.trim())
+                    .filter(word => word.length > 0);
+            }
+            
+            // 提取生字（如果输入的是"XX的X"格式，提取最后一个字）
+            wordArray = wordArray.map(item => {
+                if (item.includes('的')) {
+                    // 提取"的"后面的字
+                    const match = item.match(/的(.+)$/);
+                    return match ? match[1] : item;
+                }
+                return item;
+            });
+            
+            return wordArray;
+        }
+
+        // 朗读单词
+        function speakWord(word) {
+            return new Promise((resolve) => {
+                if (currentUtterance) {
+                    speechSynthesis.cancel();
+                }
+
+                // 确保语音已初始化
+                if (!selectedVoice) {
+                    initVoice();
+                }
+
+                currentUtterance = new SpeechSynthesisUtterance(word);
+                
+                // 设置语言和语音
+                currentUtterance.lang = 'zh-CN';
+                if (selectedVoice) {
+                    currentUtterance.voice = selectedVoice;
+                }
+                
+                // 优化语音参数，使发音更标准清晰
+                // 对于中文，稍微降低语速可以提高清晰度
+                let rate = parseFloat(speedSlider.value);
+                // 如果语速过快，稍微降低以确保清晰度
+                if (rate > 1.0) {
+                    rate = Math.min(rate, 1.0);
+                }
+                currentUtterance.rate = rate;
+                currentUtterance.pitch = 1.0; // 标准音调，不高不低
+                currentUtterance.volume = 1.0; // 最大音量，确保清晰
+
+                // 确保在朗读前取消之前的语音
+                speechSynthesis.cancel();
+
+                currentUtterance.onend = () => {
+                    // 每个词读完后等待一小段时间
+                    setTimeout(resolve, 300);
+                };
+
+                currentUtterance.onerror = (error) => {
+                    console.error('语音合成错误:', error);
+                    resolve();
+                };
+
+                // 稍微延迟以确保之前的语音已取消
+                setTimeout(() => {
+                    speechSynthesis.speak(currentUtterance);
+                }, 50);
+            });
+        }
+
+        // 朗读当前词（3遍）
+        async function speakCurrentWord() {
+            if (!isPlaying || isPaused) return;
+
+            const word = words[currentIndex];
+            const wordPhrase = getWordPhrase(word);
+            
+            // 显示生字和组词
+            currentWordDisplay.textContent = word;
+            progressInfo.textContent = `第 ${currentIndex + 1} 个词，第 ${currentRepeat + 1} 遍（共3遍）\n${wordPhrase}`;
+
+            // 朗读组词格式
+            await speakWord(wordPhrase);
+            currentRepeat++;
+
+            if (currentRepeat < 3) {
+                // 继续读同一词
+                await speakCurrentWord();
+            } else {
+                // 读完3遍，等待设定的间隔时间再读下一个词
+                const intervalSeconds = parseInt(intervalSlider.value);
+                currentRepeat = 0;
+                currentIndex++;
+
+                if (currentIndex < words.length) {
+                    // 显示倒计时
+                    let remainingSeconds = intervalSeconds;
+                    progressInfo.textContent = `第 ${currentIndex} 个词已完成\n等待 ${remainingSeconds} 秒后开始下一个词...`;
+                    
+                    // 倒计时等待
+                    await new Promise((resolve) => {
+                        countdownTimer = setInterval(() => {
+                            // 检查是否暂停或停止
+                            if (!isPlaying || isPaused) {
+                                clearInterval(countdownTimer);
+                                countdownTimer = null;
+                                resolve();
+                                return;
+                            }
+                            
+                            remainingSeconds--;
+                            if (remainingSeconds > 0) {
+                                progressInfo.textContent = `第 ${currentIndex} 个词已完成\n等待 ${remainingSeconds} 秒后开始下一个词...`;
+                            } else {
+                                clearInterval(countdownTimer);
+                                countdownTimer = null;
+                                resolve();
+                            }
+                        }, 1000);
+                    });
+                    
+                    // 检查是否还在播放且未暂停，再继续下一个词
+                    if (isPlaying && !isPaused) {
+                        await speakCurrentWord();
+                    }
+                } else {
+                    // 全部读完
+                    finish();
+                }
+            }
+        }
+
+        // 开始默写
+        async function start() {
+            const text = wordListInput.value.trim();
+            words = parseWordList(text);
+
+            if (words.length === 0) {
+                alert('请输入生字表！');
+                return;
+            }
+
+            currentIndex = 0;
+            currentRepeat = 0;
+            isPlaying = true;
+            isPaused = false;
+
+            btnStart.disabled = true;
+            btnPause.disabled = false;
+            btnStop.disabled = false;
+            wordListInput.disabled = true;
+
+            await speakCurrentWord();
+        }
+
+        // 暂停/继续
+        function pause() {
+            if (isPaused) {
+                // 继续
+                isPaused = false;
+                btnPause.textContent = '⏸️ 暂停';
+                // 清除倒计时定时器（如果存在）
+                if (countdownTimer) {
+                    clearInterval(countdownTimer);
+                    countdownTimer = null;
+                }
+                speakCurrentWord();
+            } else {
+                // 暂停
+                isPaused = true;
+                btnPause.textContent = '▶️ 继续';
+                speechSynthesis.cancel();
+                // 清除倒计时定时器
+                if (countdownTimer) {
+                    clearInterval(countdownTimer);
+                    countdownTimer = null;
+                }
+            }
+        }
+
+        // 停止
+        function stop() {
+            isPlaying = false;
+            isPaused = false;
+            speechSynthesis.cancel();
+            
+            // 清除倒计时定时器
+            if (countdownTimer) {
+                clearInterval(countdownTimer);
+                countdownTimer = null;
+            }
+            
+            currentIndex = 0;
+            currentRepeat = 0;
+            currentWordDisplay.textContent = '准备开始...';
+            progressInfo.textContent = '等待开始';
+
+            btnStart.disabled = false;
+            btnPause.disabled = true;
+            btnStop.disabled = true;
+            wordListInput.disabled = false;
+            btnPause.textContent = '⏸️ 暂停';
+        }
+
+        // 完成
+        function finish() {
+            isPlaying = false;
+            isPaused = false;
+            
+            // 清除倒计时定时器
+            if (countdownTimer) {
+                clearInterval(countdownTimer);
+                countdownTimer = null;
+            }
+            
+            currentWordDisplay.textContent = '✅ 完成！';
+            progressInfo.textContent = `已读完 ${words.length} 个词，每个词都读了3遍`;
+
+            btnStart.disabled = false;
+            btnPause.disabled = true;
+            btnStop.disabled = true;
+            wordListInput.disabled = false;
+            btnPause.textContent = '⏸️ 暂停';
+        }
+
+        // 绑定事件
+        btnStart.addEventListener('click', start);
+        btnPause.addEventListener('click', pause);
+        btnStop.addEventListener('click', stop);
+
+        // 页面关闭时停止朗读
+        window.addEventListener('beforeunload', () => {
+            speechSynthesis.cancel();
+            if (countdownTimer) {
+                clearInterval(countdownTimer);
+            }
+        });
+    </script>
+</body>
+</html>
