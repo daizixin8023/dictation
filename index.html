@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="小学生字默写工具，自动朗读生字，每个词读3遍，适合家长辅导孩子默写">
-    <title>小学生字默写工具 - 免费在线使用</title>
+    <meta name="description" content="二年级下期生字默写工具，自动朗读生字，每个词读3遍，适合家长辅导孩子默写">
+    <title>二年级下期默写工具 - 免费在线使用</title>
     <style>
         * {
             margin: 0;
@@ -285,21 +285,28 @@
 <body>
     <div class="container">
         <h1>📚 小学生字默写工具</h1>
-        <div class="subtitle">免费在线使用 · 自动朗读 · 每个词读3遍</div>
+        <div class="subtitle">二年级下期专用 · 免费在线使用 · 每个词读3遍</div>
         
         <div class="help-section">
             <h3>📖 使用说明</h3>
             <ul>
-                <li>在下方输入框中输入生字（每行一个，或用逗号/空格分隔）</li>
-                <li>点击"开始默写"按钮，工具会自动朗读每个生字</li>
-                <li>每个生字会以"XX的X"格式读3遍（如：害羞的羞）</li>
-                <li>可以随时暂停、继续或停止</li>
-                <li>支持自定义朗读速度和默写间隔时间</li>
+                <li><strong>快速加载</strong>：输入如"语文第三课"、"英语第1课"、"英语U3"（大小写不敏感），点击搜索加载</li>
+                <li>也可手动输入生字（每行一个，或用逗号/空格分隔）</li>
+                <li>点击"开始默写"，每个词读3遍（语文：XX的X格式；英语：直接读单词）</li>
+                <li>可随时暂停、继续或停止，支持调节语速和间隔</li>
             </ul>
         </div>
 
         <div class="input-section">
-            <label for="wordList">请输入生字表：</label>
+            <label>🔍 快速加载（本工具为二年级下期定做，直接输入科目和课次）：</label>
+            <div style="display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap;">
+                <input type="text" id="keywordInput" placeholder="如：语文第三课、英语第1课、英语U3" style="flex: 1; min-width: 200px; padding: 8px 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px;">
+                <button id="btnSearch" class="btn-secondary" style="margin-top: 0;">搜索加载</button>
+            </div>
+            <div class="hint" style="margin-bottom: 15px; font-size: 12px;">
+                支持：语文第1课、语文第三课、英语第2课、英语U3/Unit3（大小写不敏感）等
+            </div>
+            <label for="wordList">请输入生字表（或使用上方搜索）：</label>
             <textarea id="wordList" placeholder="例如：&#10;苹果&#10;香蕉&#10;橙子&#10;&#10;或者：苹果,香蕉,橙子"></textarea>
             <div class="hint">💡 提示：可以每行一个词，也可以用逗号或空格分隔</div>
             <div style="margin-top: 10px; display: flex; gap: 10px; flex-wrap: wrap;">
@@ -340,7 +347,7 @@
         </div>
 
         <div class="footer">
-            <p>💝 免费工具 · 适合1-6年级小学生使用</p>
+            <p>💝 二年级下期专用 · 免费工具</p>
             <p style="margin-top: 5px; font-size: 11px;">建议使用 Chrome 或 Edge 浏览器以获得最佳体验</p>
             <p style="margin-top: 5px; font-size: 11px;">生字表会自动保存，方便下次使用</p>
         </div>
@@ -419,6 +426,8 @@
         const btnStop = document.getElementById('btnStop');
         const btnLoadDefault = document.getElementById('btnLoadDefault');
         const btnClear = document.getElementById('btnClear');
+        const keywordInput = document.getElementById('keywordInput');
+        const btnSearch = document.getElementById('btnSearch');
         const currentWordDisplay = document.getElementById('currentWord');
         const progressInfo = document.getElementById('progressInfo');
         const speedSlider = document.getElementById('speedSlider');
@@ -427,45 +436,123 @@
         const intervalValue = document.getElementById('intervalValue');
         let countdownTimer = null;
 
-        // 二年级下册第一、二课生字表及组词
-        const defaultWords = [
-            // 第一课
-            '羞', '遮', '掩', '躲', '探', '嫩', '符', '触', '鹊',
-            // 第二课
-            '枯', '荣', '宿', '徐', '篱', '疏', '未'
+        // 课程数据库：年级下期 + 科目 + 课
+        // 格式：{ keywords: ['二下语文第1课', ...], words: [...], phrases: {...}, isEnglish: false }
+        const lessonDatabase = [
+            // 二年级下 语文
+            { keywords: ['二下语文第1课', '二下语文第一课', '二年级下语文第1课', '二年级下期语文第1课'], 
+              words: ['羞','遮','掩','躲','探','嫩','符','触','鹊'],
+              phrases: { '羞':'害羞的羞','遮':'遮挡的遮','掩':'掩盖的掩','躲':'躲藏的躲','探':'探头的探','嫩':'嫩绿的嫩','符':'符号的符','触':'触摸的触','鹊':'喜鹊的鹊' },
+              isEnglish: false },
+            { keywords: ['二下语文第2课', '二下语文第二课', '二年级下语文第2课'],
+              words: ['枯','荣','宿','徐','篱','疏','未'],
+              phrases: { '枯':'枯萎的枯','荣':'光荣的荣','宿':'住宿的宿','徐':'徐徐的徐','篱':'篱笆的篱','疏':'疏远的疏','未':'未来的未' },
+              isEnglish: false },
+            { keywords: ['二下语文第3课', '二下语文第三课', '二年级下语文第3课'],
+              words: ['笋','唤','揉','漆','轰','扭','钻','唠','辫','抚','滋','润','冈','豪'],
+              phrases: { '笋':'竹笋的笋','唤':'呼唤的唤','揉':'揉眼的揉','漆':'漆黑的漆','轰':'轰隆的轰','扭':'扭动的扭','钻':'钻出的钻','唠':'唠叨的唠','辫':'辫子的辫','抚':'抚摸的抚','滋':'滋润的滋','润':'湿润的润','冈':'山冈的冈','豪':'自豪的豪' },
+              isEnglish: false },
+            { keywords: ['二下语文第4课', '二下语文第四课', '二年级下语文第4课'],
+              words: ['玫','瑰','骨','终','瘸','拐','惋','莺'],
+              phrases: { '玫':'玫瑰的玫','瑰':'玫瑰的瑰','骨':'骨头的骨','终':'终于的终','瘸':'瘸腿的瘸','拐':'拐杖的拐','惋':'惋惜的惋','莺':'黄莺的莺' },
+              isEnglish: false },
+            { keywords: ['二下语文第5课', '二下语文第五课', '二年级下语文第5课'],
+              words: ['哦','股','缝','罐','塔','杜','鹃','脆'],
+              phrases: { '哦':'哦的哦','股':'一股的股','缝':'石缝的缝','罐':'罐子的罐','塔':'宝塔的塔','杜':'杜鹃的杜','鹃':'杜鹃的鹃','脆':'清脆的脆' },
+              isEnglish: false },
+            { keywords: ['二下语文第6课', '二下语文第六课', '二年级下语文第6课'],
+              words: ['锋','叔','曾','泞','窝','迈','荆','棘','瓣','莹','觅','需'],
+              phrases: { '锋':'雷锋的锋','叔':'叔叔的叔','曾':'曾经的曾','泞':'泥泞的泞','窝':'鸟窝的窝','迈':'迈步的迈','荆':'荆棘的荆','棘':'荆棘的棘','瓣':'花瓣的瓣','莹':'晶莹的莹','觅':'寻觅的觅','需':'需要的需' },
+              isEnglish: false },
+            { keywords: ['二下语文第7课', '二下语文第七课', '二年级下语文第7课'],
+              words: ['弱','末','萨','托','铃','簇','随','芬','芳','聊','倾','递','娇','掀'],
+              phrases: { '弱':'弱小的弱','末':'末端的末','萨':'萨沙的萨','托':'托起的托','铃':'铃兰的铃','簇':'一簇的簇','随':'随风的随','芬':'芬芳的芬','芳':'芬芳的芳','聊':'聊天的聊','倾':'倾盆的倾','递':'传递的递','娇':'娇嫩的娇','掀':'掀起的掀' },
+              isEnglish: false },
+            { keywords: ['二下语文第8课', '二下语文第八课', '二年级下语文第8课'],
+              words: ['卡','罗','尔','适','余','垫','洛','喵','绒','屉','免','糊','涂','厨','蹭'],
+              phrases: { '卡':'卡片的卡','罗':'罗尔的罗','尔':'罗尔的尔','适':'舒适的适','余':'余下的余','垫':'垫子的垫','洛':'洛洛的洛','喵':'喵喵的喵','绒':'绒毛的绒','屉':'抽屉的屉','免':'免费的免','糊':'糊涂的糊','涂':'糊涂的涂','厨':'厨房的厨','蹭':'蹭饭的蹭' },
+              isEnglish: false },
+            // 二年级下 英语
+            { keywords: ['二下英语第1课', '二下英语第一课', '二年级下英语第1课', '二年级下期英语第1课', '二下英语Unit1'],
+              words: ['play','football','fly','kite','ride','bike','swim','snowman','can','look','make','model','plane'],
+              phrases: { 'play':'play','football':'football','fly':'fly','kite':'kite','ride':'ride','bike':'bike','swim':'swim','snowman':'snowman','can':'can','look':'look','make':'make','model':'model','plane':'plane' },
+              isEnglish: true },
+            { keywords: ['二下英语第2课', '二下英语第二课', '二年级下英语第2课', '二下英语Unit2'],
+              words: ['weather','sunny','cloudy','rainy','windy','snowy','cold','cool','warm','hot','umbrella','raincoat','scarf','sunglasses','coat'],
+              phrases: {},
+              isEnglish: true },
+            { keywords: ['二下英语第3课', '二下英语第三课', '二年级下英语第3课', '二下英语Unit3'],
+              words: ['spring','summer','autumn','winter','season','warm','hot','cool','cold'],
+              phrases: {},
+              isEnglish: true },
+            { keywords: ['二下英语第4课', '二下英语第四课', '二年级下英语第4课', '二下英语Unit4'],
+              words: ['time','clock','oclock','breakfast','lunch','dinner','bed'],
+              phrases: {},
+              isEnglish: true },
+            { keywords: ['二下英语第5课', '二下英语第五课', '二年级下英语第5课', '二下英语Unit5'],
+              words: ['get','up','go','school','home','bed','morning','afternoon','evening'],
+              phrases: {},
+              isEnglish: true },
+            { keywords: ['二下英语第6课', '二下英语第六课', '二年级下英语第6课', '二下英语Unit6'],
+              words: ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday','week'],
+              phrases: {},
+              isEnglish: true }
         ];
 
-        // 生字组词映射（用于朗读时自动组词）
-        const wordPhrases = {
-            '羞': '害羞的羞',
-            '遮': '遮挡的遮',
-            '掩': '掩盖的掩',
-            '躲': '躲藏的躲',
-            '探': '探头的探',
-            '嫩': '嫩绿的嫩',
-            '符': '符号的符',
-            '触': '触摸的触',
-            '鹊': '喜鹊的鹊',
-            '枯': '枯萎的枯',
-            '荣': '光荣的荣',
-            '宿': '住宿的宿',
-            '徐': '徐徐的徐',
-            '篱': '篱笆的篱',
-            '疏': '疏远的疏',
-            '未': '未来的未'
-        };
+        // 默认示例（二下语文第1、2课）
+        const defaultWords = ['羞','遮','掩','躲','探','嫩','符','触','鹊','枯','荣','宿','徐','篱','疏','未'];
+
+        // 合并所有语文的 phrases 用于 getWordPhrase
+        const wordPhrases = Object.assign({}, ...lessonDatabase.filter(l => !l.isEnglish).map(l => l.phrases || {}));
+
+        // 当前课程类型（用于朗读时选择语言）
+        let currentLessonIsEnglish = false;
+
+        // 数字转换
+        const numToChinese = { 1:'一',2:'二',3:'三',4:'四',5:'五',6:'六',7:'七',8:'八',9:'九',10:'十' };
+        const chineseToNum = { '一':1,'二':2,'三':3,'四':4,'五':5,'六':6,'七':7,'八':8,'九':9,'十':10 };
+
+        // 根据关键字搜索课程（本工具为二年级下期定做，支持简写：语文第三课、英语第1课）
+        function searchLesson(keyword) {
+            const k = keyword.replace(/\s/g, '');
+            if (!k) return null;
+            // 精确匹配
+            for (const lesson of lessonDatabase) {
+                for (const kw of lesson.keywords) {
+                    if (k.includes(kw.replace(/\s/g, ''))) return lesson;
+                }
+            }
+            // 模糊匹配：语文第三课、英语第1课、英语U3、unit3 等（大小写不敏感）
+            let m = k.match(/(?:unit|u)(\d+)/i);
+            let subject = '英语', num = 1;
+            if (m) {
+                num = parseInt(m[1]) || 1;
+            } else {
+                m = k.match(/(二下|二年级下期?|二年级下)?(语文|英语|英文)?.*?第?([一二三四五六七八九十\d]+)课?/);
+                if (m) {
+                    subject = (m[2] || '语文');
+                    num = parseInt(m[3]) || chineseToNum[m[3]] || 1;
+                }
+            }
+            if (m) {
+                return lessonDatabase.find(l => {
+                    const isSubject = (subject.includes('英') && l.isEnglish) || ((!subject.includes('英') || subject === '语文') && !l.isEnglish);
+                    const hasLesson = l.keywords.some(kw => 
+                        kw.includes('第' + num + '课') || kw.includes('第' + numToChinese[num] + '课') || kw.includes('Unit' + num)
+                    );
+                    return isSubject && hasLesson;
+                });
+            }
+            return null;
+        }
 
         // 获取生字的组词（如果没有预设，自动生成）
         function getWordPhrase(word) {
-            if (wordPhrases[word]) {
-                return wordPhrases[word];
+            if (currentLessonIsEnglish) {
+                return wordPhrases[word] || word;
             }
-            // 如果没有预设组词，尝试从输入中提取，或者使用默认格式
-            // 如果输入的是"XX的X"格式，直接使用
-            if (word.includes('的')) {
-                return word;
-            }
-            // 否则生成一个简单的组词
+            if (wordPhrases[word]) return wordPhrases[word];
+            if (word.includes('的')) return word;
             return `${word}字的${word}`;
         }
 
@@ -511,6 +598,27 @@
             }, 500);
         });
 
+        // 关键字搜索加载
+        btnSearch.addEventListener('click', () => {
+            if (isPlaying) {
+                alert('请先停止当前默写！');
+                return;
+            }
+            const keyword = keywordInput.value.trim();
+            if (!keyword) {
+                alert('请输入关键字，如：语文第三课、英语第1课、英语U3');
+                return;
+            }
+            const lesson = searchLesson(keyword);
+            if (lesson) {
+                wordListInput.value = lesson.words.join('\n');
+                currentLessonIsEnglish = lesson.isEnglish;
+                keywordInput.placeholder = '已加载：' + lesson.keywords[0];
+            } else {
+                alert('未找到匹配的课程，请尝试：\n语文第1课、语文第三课\n英语第1课、英语U3（大小写不敏感）');
+            }
+        });
+
         // 点击按钮加载默认生字表
         btnLoadDefault.addEventListener('click', () => {
             if (isPlaying) {
@@ -518,6 +626,7 @@
                 return;
             }
             wordListInput.value = defaultWords.join('\n');
+            currentLessonIsEnglish = false;
         });
 
         // 清空输入框
@@ -528,6 +637,8 @@
             }
             if (confirm('确定要清空生字表吗？')) {
                 wordListInput.value = '';
+                currentLessonIsEnglish = false;
+                keywordInput.placeholder = '如：语文第三课、英语第1课、英语U3';
             }
         });
 
@@ -570,23 +681,23 @@
             return wordArray;
         }
 
-        // 朗读单词
-        function speakWord(word) {
+        // 朗读单词（支持中文/英文）
+        function speakWord(word, isEnglish = false) {
             return new Promise((resolve) => {
                 if (currentUtterance) {
                     speechSynthesis.cancel();
                 }
 
                 // 确保语音已初始化
-                if (!selectedVoice) {
+                if (!selectedVoice && !isEnglish) {
                     initVoice();
                 }
 
                 currentUtterance = new SpeechSynthesisUtterance(word);
                 
-                // 设置语言和语音
-                currentUtterance.lang = 'zh-CN';
-                if (selectedVoice) {
+                // 设置语言：英语用 en-US，中文用 zh-CN
+                currentUtterance.lang = isEnglish ? 'en-US' : 'zh-CN';
+                if (selectedVoice && !isEnglish) {
                     currentUtterance.voice = selectedVoice;
                 }
                 
@@ -632,8 +743,8 @@
             currentWordDisplay.textContent = word;
             progressInfo.textContent = `第 ${currentIndex + 1} 个词，第 ${currentRepeat + 1} 遍（共3遍）\n${wordPhrase}`;
 
-            // 朗读组词格式
-            await speakWord(wordPhrase);
+            // 朗读组词格式（英语直接读单词）
+            await speakWord(wordPhrase, currentLessonIsEnglish);
             currentRepeat++;
 
             if (currentRepeat < 3) {
@@ -683,6 +794,13 @@
             }
         }
 
+        // 检测是否为英文内容（简单判断：首字为字母）
+        function detectIsEnglish(words) {
+            if (!words.length) return false;
+            const first = words[0];
+            return /^[a-zA-Z]+$/.test(first);
+        }
+
         // 开始默写
         async function start() {
             const text = wordListInput.value.trim();
@@ -692,6 +810,9 @@
                 alert('请输入生字表！');
                 return;
             }
+
+            // 自动检测中英文
+            currentLessonIsEnglish = detectIsEnglish(words);
 
             currentIndex = 0;
             currentRepeat = 0;
