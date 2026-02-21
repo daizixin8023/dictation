@@ -291,9 +291,9 @@
             <h3>📖 使用说明</h3>
             <ul>
                 <li><strong>快速加载</strong>：输入如"语文第三课"、"英语第1课"、"英语U3"（大小写不敏感），点击搜索加载</li>
-                <li>也可手动输入生字（每行一个，或用逗号/空格分隔）</li>
-                <li>点击"开始默写"，每个词读3遍（语文：XX的X格式；英语：直接读单词）</li>
-                <li>可随时暂停、继续或停止，支持调节语速和间隔</li>
+                <li>可手动输入：<strong>生字/词语</strong>（每行一个或用逗号/空格分隔）、<strong>中英混合</strong>、<strong>句子</strong>（整句一行，直接听写）</li>
+                <li><strong>朗读规则</strong>：词语直接读（如「裹紧」只读裹紧）；单字无组词时读「X字的X」；英文按条自动识别；句子整句朗读</li>
+                <li>点击「开始默写」，每条读3遍，可随时暂停、继续或停止，支持调节语速和间隔</li>
             </ul>
         </div>
 
@@ -306,9 +306,9 @@
             <div class="hint" style="margin-bottom: 15px; font-size: 12px;">
                 支持：语文第1课、语文第三课、英语第2课、英语U3/Unit3（大小写不敏感）等
             </div>
-            <label for="wordList">请输入生字表（或使用上方搜索）：</label>
-            <textarea id="wordList" placeholder="例如：&#10;苹果&#10;香蕉&#10;橙子&#10;&#10;或者：苹果,香蕉,橙子"></textarea>
-            <div class="hint">💡 提示：可以每行一个词，也可以用逗号或空格分隔</div>
+            <label for="wordList">请输入生字/词语/英文/句子（或使用上方搜索）：</label>
+            <textarea id="wordList" placeholder="例如：&#10;裹紧,颈动脉,宿舍&#10;apple, weather&#10;今天天气很好。"></textarea>
+            <div class="hint">💡 提示：每行一条，或用逗号/空格分隔；支持中文词语、英语单词、整句默写</div>
             <div style="margin-top: 10px; display: flex; gap: 10px; flex-wrap: wrap;">
                 <button id="btnLoadDefault" class="btn-secondary">📖 加载示例</button>
                 <button id="btnClear" class="btn-secondary">🗑️ 清空</button>
@@ -546,13 +546,22 @@
             return null;
         }
 
-        // 获取生字的组词（如果没有预设，自动生成）
+        // 判断一条是否为英文（无中文字符即视为英文，支持单词和句子）
+        function isItemEnglish(item) {
+            return item.length > 0 && !/[一-龥]/.test(item);
+        }
+
+        // 获取朗读内容：词语/句子直接读原文，仅单字用「X字的X」组词
         function getWordPhrase(word) {
-            if (currentLessonIsEnglish) {
-                return wordPhrases[word] || word;
-            }
+            // 英文（单词或句子）：直接读
+            if (isItemEnglish(word)) return word;
+            // 有预设组词（如课程库里的单字）：用预设
             if (wordPhrases[word]) return wordPhrases[word];
+            // 已是完整说法（含「的」）：直接读
             if (word.includes('的')) return word;
+            // 多字词/句子：直接听写，不组词
+            if (word.length > 1) return word;
+            // 单字且无预设：用「X字的X」
             return `${word}字的${word}`;
         }
 
@@ -668,11 +677,10 @@
                     .filter(word => word.length > 0);
             }
             
-            // 提取生字（如果输入的是"XX的X"格式，提取最后一个字）
+            // 仅当格式为「XX的X」（的后面只有一个字）时提取该字，否则保留整条（词语/句子）
             wordArray = wordArray.map(item => {
                 if (item.includes('的')) {
-                    // 提取"的"后面的字
-                    const match = item.match(/的(.+)$/);
+                    const match = item.match(/的(.)$/);
                     return match ? match[1] : item;
                 }
                 return item;
@@ -732,19 +740,20 @@
             });
         }
 
-        // 朗读当前词（3遍）
+        // 朗读当前词（3遍）；支持中文/英文/句子，按条自动识别语言
         async function speakCurrentWord() {
             if (!isPlaying || isPaused) return;
 
             const word = words[currentIndex];
             const wordPhrase = getWordPhrase(word);
+            const useEnglish = isItemEnglish(word);
             
-            // 显示生字和组词
-            currentWordDisplay.textContent = word;
-            progressInfo.textContent = `第 ${currentIndex + 1} 个词，第 ${currentRepeat + 1} 遍（共3遍）\n${wordPhrase}`;
+            // 显示当前条（词或句子）
+            currentWordDisplay.textContent = word.length > 20 ? word.slice(0, 20) + '…' : word;
+            progressInfo.textContent = `第 ${currentIndex + 1} 条，第 ${currentRepeat + 1} 遍（共3遍）\n${wordPhrase.length > 40 ? wordPhrase.slice(0, 40) + '…' : wordPhrase}`;
 
-            // 朗读组词格式（英语直接读单词）
-            await speakWord(wordPhrase, currentLessonIsEnglish);
+            // 按条自动选择中/英朗读
+            await speakWord(wordPhrase, useEnglish);
             currentRepeat++;
 
             if (currentRepeat < 3) {
@@ -763,7 +772,7 @@
                 if (currentIndex < words.length) {
                     // 显示倒计时
                     let remainingSeconds = intervalSeconds;
-                    progressInfo.textContent = `第 ${currentIndex} 个词已完成\n等待 ${remainingSeconds} 秒后开始下一个词...`;
+                    progressInfo.textContent = `第 ${currentIndex} 条已完成\n等待 ${remainingSeconds} 秒后开始下一条...`;
                     
                     // 倒计时等待
                     await new Promise((resolve) => {
@@ -778,7 +787,7 @@
                             
                             remainingSeconds--;
                             if (remainingSeconds > 0) {
-                                progressInfo.textContent = `第 ${currentIndex} 个词已完成\n等待 ${remainingSeconds} 秒后开始下一个词...`;
+                                progressInfo.textContent = `第 ${currentIndex} 条已完成\n等待 ${remainingSeconds} 秒后开始下一条...`;
                             } else {
                                 clearInterval(countdownTimer);
                                 countdownTimer = null;
@@ -811,11 +820,11 @@
             words = parseWordList(text);
 
             if (words.length === 0) {
-                alert('请输入生字表！');
+                alert('请输入生字/词语、英文或句子！');
                 return;
             }
 
-            // 自动检测中英文
+            // 搜索加载的课程仍用于占位显示；朗读按条自动识别中/英
             currentLessonIsEnglish = detectIsEnglish(words);
 
             currentIndex = 0;
@@ -892,7 +901,7 @@
             }
             
             currentWordDisplay.textContent = '✅ 完成！';
-            progressInfo.textContent = `已读完 ${words.length} 个词，每个词都读了3遍`;
+            progressInfo.textContent = `已读完 ${words.length} 条，每条都读了3遍`;
 
             btnStart.disabled = false;
             btnPause.disabled = true;
